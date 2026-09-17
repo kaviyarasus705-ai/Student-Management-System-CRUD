@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Management System | Django CRUD App</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <!-- Preconnect Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+<body>
+  {% csrf_token %}
+
+  <!-- Top Header Banner -->
+  <header class="header-banner">
+    <div class="header-container">
+      <h1 class="header-title">
+        <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+        </svg>
+        Student Management System
+      </h1>
+      <p class="header-subtitle">CRUD-Based Full Stack Web Application | Django & REST API</p>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+    <!-- Stat Cards -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-info">
+          <h3>Total Students</h3>
+          <div class="stat-value" id="totalStudentsCount">0</div>
+        </div>
+        <div class="stat-icon">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-info">
+          <h3>Total Departments</h3>
+          <div class="stat-value" id="totalDeptsCount">0</div>
+        </div>
+        <div class="stat-icon depts">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Card -->
+    <section class="content-card">
+      <!-- Controls Header -->
+      <div class="control-bar">
+        <div class="search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search by ID, Name, or Department...">
+        </div>
+
+        <button class="btn btn-primary" onclick="openAddModal()">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          + Add Student
+        </button>
+      </div>
+
+      <!-- Table Section -->
+      <div class="table-responsive">
+        <table class="student-table">
+          <thead>
+            <tr>
+              <th>Student ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Department</th>
+              <th>Year</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="studentTableBody">
+            <!-- Dynamic student rows inserted here by app.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Add / Edit Student Modal -->
+  <div class="modal-overlay" id="studentModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Add New Student</h2>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+
+      <div id="formErrors" style="display: none; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 0.75rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem;">
+      </div>
+
+      <form id="studentForm">
+        <div class="form-group">
+          <label class="form-label" for="studentIdInput">Student ID *</label>
+          <input type="text" id="studentIdInput" class="form-input" placeholder="e.g. STU-2024-001" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="nameInput">Full Name *</label>
+          <input type="text" id="nameInput" class="form-input" placeholder="e.g. Alexander Pierce" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="emailInput">Email Address *</label>
+          <input type="email" id="emailInput" class="form-input" placeholder="e.g. alexander@college.edu" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="departmentInput">Department *</label>
+          <input type="text" id="departmentInput" class="form-input" placeholder="e.g. Computer Science" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="yearInput">Academic Year *</label>
+          <select id="yearInput" class="form-select" required>
+            <option value="" disabled selected>Select Year</option>
+            <option value="1">Year 1 (Freshman)</option>
+            <option value="2">Year 2 (Sophomore)</option>
+            <option value="3">Year 3 (Junior)</option>
+            <option value="4">Year 4 (Senior)</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Student</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-card" style="max-width: 420px;">
+      <div class="modal-header">
+        <h2 class="modal-title" style="color: #ef4444;">Confirm Delete</h2>
+        <button class="modal-close" onclick="closeDeleteModal()">✕</button>
+      </div>
+
+      <p style="color: #475569; font-size: 0.95rem; margin-bottom: 1.5rem;">
+        Are you sure you want to delete student <strong id="deleteStudentName" style="color: #0f172a;"></strong>? This action cannot be undone.
+      </p>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+        <button type="button" class="btn btn-delete" style="padding: 0.625rem 1.25rem; font-size: 0.875rem;" onclick="executeDelete()">
+          Yes, Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Application Script -->
+  <script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>
